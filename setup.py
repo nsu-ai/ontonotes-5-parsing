@@ -4,10 +4,12 @@ import ontonotes5
 
 
 long_description = '''
-Ontonotes5-Parsing
+Ontonotes-5-Parsing
 ============
+
 A simple parser of the famous Ontonotes 5 dataset
 https://catalog.ldc.upenn.edu/LDC2013T19
+
 This dataset is very useful for experiments with NER, i.e. Named Entity
 Recognition. Besides, Ontonotes 5 includes three languages (English,
 Arabic, and Chinese), and this fact increases interest to use it in
@@ -23,7 +25,7 @@ bounds in the corresponded text.
 '''
 
 setup(
-    name='ontonotes5-parsing',
+    name='ontonotes-5-parsing',
     version=ontonotes5.__version__,
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
@@ -47,10 +49,11 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    keywords=['ontonotes', 'ontonotes5', 'ner', 'nlp', 'multi-lingual'],
+    keywords=['ontonotes', 'ontonotes5', 'ontonotes-5', 'ner', 'nlp',
+              'multi-lingual'],
     install_requires=['tqdm', 'numpy'],
     test_suite='tests',
     entry_points={
-        'console_scripts': ['ontonotes5_to_json = ontonotes_to_json:main']
+        'console_scripts': ['ontonotes5_to_json = ontonotes5_to_json:main']
     }
 )

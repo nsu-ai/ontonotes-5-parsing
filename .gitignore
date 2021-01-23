@@ -1,3 +1,5 @@
+*.egg-info
+dist
 nohup.out
 log.txt
 .idea
