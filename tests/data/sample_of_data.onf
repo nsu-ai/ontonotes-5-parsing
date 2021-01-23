@@ -1,0 +1,258 @@
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
+    In the summer of 2005, a picture that people have long been looking forward to started emerging with frequency in
+    various major Hong Kong media.
+
+Treebanked sentence:
+--------------------
+    In the summer of 2005 , a picture that people have long been looking forward to *T*-1 started *-2 emerging with
+    frequency in various major Hong Kong media .
+
+Speaker information:
+--------------------
+    name: Speaker#1
+    start time: 47.836
+    stop time: 55.349620893
+
+Tree:
+-----
+    (TOP (S (PP-TMP (IN In)
+                    (NP (NP (DT the)
+                            (NN summer))
+                        (PP (IN of)
+                            (NP (CD 2005)))))
+            (, ,)
+            (NP-SBJ-2 (NP (DT a)
+                          (NN picture))
+                      (SBAR (WHNP-1 (WDT that))
+                            (S (NP-SBJ (NNS people))
+                               (VP (VBP have)
+                                   (ADVP-TMP (RB long))
+                                   (VP (VBN been)
+                                       (VP (VBG looking)
+                                           (ADVP-DIR (RB forward)
+                                                     (PP (IN to)
+                                                         (NP (-NONE- *T*-1))))))))))
+            (VP (VBD started)
+                (S (NP-SBJ (-NONE- *-2))
+                   (VP (VBG emerging)
+                       (PP-MNR (IN with)
+                               (NP (NN frequency)))
+                       (PP-LOC (IN in)
+                               (NP (JJ various)
+                                   (JJ major)
+                                   (NML (NNP Hong)
+                                        (NNP Kong))
+                                   (NNS media))))))
+            (. .)))
+
+Leaves:
+-------
+    0   In
+    1   the
+           name:  DATE               1-4    the summer of 2005
+    2   summer
+    3   of
+    4   2005
+    5   ,
+    6   a
+    7   picture
+    8   that
+    9   people
+    10  have
+           prop:  have.01
+            v          * -> 10:0, have
+    11  long
+    12  been
+           prop:  be.03
+            v          * -> 12:0, been
+    13  looking
+           sense: look-v.5
+           prop:  look.01
+            v          * -> 13:0, looking
+            ARG0       * -> 9:1,  people
+            ARGM-TMP   * -> 11:1, long
+            ARG1       * -> 14:1, forward to *T*-1
+    14  forward
+    15  to
+    16  *T*-1
+    17  started
+           sense: start-v.2
+           prop:  start.01
+            v          * -> 17:0, started
+            ARGM-TMP   * -> 0:1,  In the summer of 2005
+            ARG1       * -> 6:2,  a picture that people have long been looking forward to *T*-1
+            ARG1       * -> 18:2, *-2 emerging with frequency in various major Hong Kong media
+    18  *-2
+    19  emerging
+           sense: emerge-v.2
+           prop:  emerge.01
+            v          * -> 19:0, emerging
+            ARG0       * -> 18:0, *-2 -> 6:2, a picture that people have long been looking forward to *T*-1
+            ARGM-MNR   * -> 20:1, with frequency
+            ARGM-LOC   * -> 22:1, in various major Hong Kong media
+    20  with
+    21  frequency
+    22  in
+    23  various
+    24  major
+    25  Hong
+           coref: IDENT        12    25-26  Hong Kong
+           name:  GPE                25-26  Hong Kong
+    26  Kong
+    27  media
+    28  .
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
+    With their unique charm, these well-known cartoon images once again caused Hong Kong to be a focus of worldwide
+    attention.
+
+Treebanked sentence:
+--------------------
+    With their unique charm , these well - known cartoon images once again caused Hong Kong to be a focus of worldwide
+    attention .
+
+Speaker information:
+--------------------
+    name: Speaker#1
+    start time: 55.349620893
+    stop time: 63.0834035383
+
+Tree:
+-----
+    (TOP (S (PP (IN With)
+                (NP (PRP$ their)
+                    (JJ unique)
+                    (NN charm)))
+            (, ,)
+            (NP-SBJ (DT these)
+                    (ADJP (RB well)
+                          (HYPH -)
+                          (VBN known))
+                    (NN cartoon)
+                    (NNS images))
+            (ADVP-TMP (RB once)
+                      (RB again))
+            (VP (VBD caused)
+                (S (NP-SBJ (NNP Hong)
+                           (NNP Kong))
+                   (VP (TO to)
+                       (VP (VB be)
+                           (NP-PRD (NP (DT a)
+                                       (NN focus))
+                                   (PP (IN of)
+                                       (NP (JJ worldwide)
+                                           (NN attention))))))))
+            (. .)))
+
+Leaves:
+-------
+    0   With
+    1   their
+           coref: IDENT        11    1-1    their
+    2   unique
+    3   charm
+    4   ,
+    5   these
+           coref: IDENT        11    5-10   these well - known cartoon images
+    6   well
+    7   -
+    8   known
+           prop:  know.01
+            v          * -> 8:0,  known
+            ARGM-EXT   * -> 6:0,  well
+            ARG1       * -> 9:0,  cartoon
+                         -> 10:0, images
+    9   cartoon
+    10  images
+    11  once
+    12  again
+    13  caused
+           sense: cause-v.1
+           prop:  cause.01
+            v          * -> 13:0, caused
+            ARGM-MNR   * -> 0:1,  With their unique charm
+            ARG0       * -> 5:1,  these well - known cartoon images
+            ARGM-TMP   * -> 11:1, once again
+            ARG1       * -> 14:2, Hong Kong to be a focus of worldwide attention
+    14  Hong
+           coref: IDENT        12    14-15  Hong Kong
+           name:  GPE                14-15Hong Kong
+    15  Kong
+    16  to
+    17  be
+           sense: be-v.1
+           prop:  be.01
+            v          * -> 17:0, be
+            ARG1       * -> 14:1, Hong Kong
+            ARG2       * -> 18:2, a focus of worldwide attention
+    18  a
+    19  focus
+    20  of
+    21  worldwide
+    22  attention
+    23  .
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
+    -LRB-و ص ف, رويترز, أب-RRB-
+
+Treebanked sentence:
+--------------------
+    -LRB- و ص ف , رُويْتِرز , أب -RRB-
+
+Tree:
+-----
+    (TOP (NP (PUNC -LRB-)
+             (NP (ABBREV و)
+                 (ABBREV ص)
+                 (ABBREV ف))
+             (PUNC ,)
+             (NP (NOUN_PROP رُويْتِرز))
+             (PUNC ,)
+             (NP (ABBREV أب))
+             (PUNC -RRB-)))
+
+Leaves:
+-------
+    0   -LRB-
+    1   و
+    2   ص
+    3   ف
+    4   ,
+    5   رُويْتِرز
+           name:  ORG                5-5    رُويْتِرز
+    6   ,
+    7   أب
+    8   -RRB-
+
+
+========================================================================================================================
+Coreference chains for section 11:
+----------------------------------
+
+    Chain 0 (IDENT)
+               210.0-3    The KMT vice chairman
+               211.9-12   Wang Jin - pyng
+               211.14-14  his
+               211.20-20  his
+               212.0-0    He
+               212.3-3    he
+
+    Chain CCTV4_ACROSSCHINA_CMN_20050812_150501-part-011-E1 (IDENT)
+               210.1-1    KMT
+               210.12-12  KMT
+               211.23-23  KMT
+
+    Chain 3 (IDENT)
+               210.12-15  KMT Chairman Lien Chan
+               212.6-7    Lien Chan
