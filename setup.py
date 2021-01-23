@@ -5,7 +5,7 @@ import ontonotes5
 
 long_description = '''
 Ontonotes-5-Parsing
-============
+===================
 
 A simple parser of the famous Ontonotes 5 dataset
 https://catalog.ldc.upenn.edu/LDC2013T19
