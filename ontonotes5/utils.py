@@ -1138,22 +1138,22 @@ def load_ontonotes5_from_json(file_name: str) -> Dict[
                             raise ValueError(err_msg)
                         start_pos = cur_bounds[0]
                         end_pos = cur_bounds[1]
-                        if start_pos > end_pos:
-                            raise ValueError(err_msg)
-                        if start_pos <= end_pos:
-                            end_pos = start_pos + 1
-                        if start_pos <= prev_pos:
-                            prepared_bounds[-1] = (
-                                prepared_bounds[-1][0],
-                                end_pos
-                            )
-                        else:
-                            prepared_bounds.append((start_pos, end_pos))
-                        # if start_pos >= end_pos:
+                        # if start_pos > end_pos:
                         #     raise ValueError(err_msg)
+                        # if start_pos <= end_pos:
+                        #     end_pos = start_pos + 1
                         # if start_pos <= prev_pos:
-                        #     raise ValueError(err_msg)
-                        # prepared_bounds.append((start_pos, end_pos))
+                        #     prepared_bounds[-1] = (
+                        #         prepared_bounds[-1][0],
+                        #         end_pos
+                        #     )
+                        # else:
+                        #     prepared_bounds.append((start_pos, end_pos))
+                        if start_pos >= end_pos:
+                            raise ValueError(err_msg)
+                        if start_pos <= prev_pos:
+                            raise ValueError(err_msg)
+                        prepared_bounds.append((start_pos, end_pos))
                         prev_pos = end_pos
                         if end_pos > max_end_pos:
                             max_end_pos = end_pos
