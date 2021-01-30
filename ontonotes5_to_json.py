@@ -8,7 +8,7 @@ import tarfile
 from tempfile import NamedTemporaryFile
 from typing import Dict, List, Tuple, Union
 
-# from tqdm import tqdm
+from tqdm import tqdm
 
 from ontonotes5.utils import parse_file, parse_splitting, check_onf_name
 from ontonotes5.utils import get_language_by_filename
@@ -69,7 +69,7 @@ def main():
         '-d',
         '--dst',
         dest='dst_file', type=str, required=True,
-        help='The destionation *.json file with texts and their annotations '
+        help='The destination *.json file with texts and their annotations '
              '(named entities, morphology and syntax).'
     )
     parser.add_argument(
@@ -132,8 +132,7 @@ def main():
         err_msg = 'There are no labeled texts with *.onf extension in the ' \
                   '"{0}"!'.format(src_file_name)
         assert number_of_members > 0, err_msg
-        # for cur_name in tqdm(onf_names):
-        for cur_name in onf_names:
+        for cur_name in tqdm(onf_names):
             language = get_language_by_filename(cur_name)
             tmp_name = None
             try:
@@ -229,7 +228,6 @@ def main():
                     print('      {0:>{1}} {2}'.format(entity_type, max_width,
                                                       entity_freq))
             print('')
-
 
 
 if __name__ == '__main__':

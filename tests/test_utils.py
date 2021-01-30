@@ -11,8 +11,11 @@ from ontonotes5.utils import parse_tree, parse_named_entities_labeling
 from ontonotes5.utils import megre_bounds, parse_file
 from ontonotes5.utils import split_filename_by_parts, check_onf_name
 from ontonotes5.utils import parse_splitting
+from ontonotes5.utils import find_subword_bounds
 from ontonotes5.utils import get_language_by_filename
 from ontonotes5.utils import is_item_in_sequence
+from ontonotes5.utils import unite_overlapped_bounds, check_bounds
+from ontonotes5.utils import insert_new_bounds, calculate_distance
 
 
 class TestUtils(unittest.TestCase):
@@ -107,6 +110,20 @@ class TestUtils(unittest.TestCase):
         text = '123 fkj 4fkl'
         source_bounds = [(0, 3), (4, 7), (8, 12)]
         true_bounds = [(0, 3), (4, 7), (8, 12)]
+        calc_bounds = strip_bounds(text, source_bounds)
+        self.assertEqual(true_bounds, calc_bounds)
+
+    def test_strip_bounds_pos04(self):
+        text = '123, fkj-4fkl '
+        source_bounds = [(0, 3), (3, 5), (5, 8), (8, 9), (9, 14)]
+        true_bounds = [(0, 3), (3, 4), (5, 8), (8, 9), (9, 13)]
+        calc_bounds = strip_bounds(text, source_bounds)
+        self.assertEqual(true_bounds, calc_bounds)
+
+    def test_strip_bounds_pos05(self):
+        text = '123,fkj-4fkl'
+        source_bounds = [(0, 3), (3, 4), (4, 7), (7, 8), (8, 12)]
+        true_bounds = [(0, 3), (3, 4), (4, 7), (7, 8), (8, 12)]
         calc_bounds = strip_bounds(text, source_bounds)
         self.assertEqual(true_bounds, calc_bounds)
 
@@ -890,6 +907,268 @@ class TestUtils(unittest.TestCase):
         calculated_bounds = get_token_bounds_fuzzy(source_text, tokenized)
         self.assertEqual(true_bounds, calculated_bounds)
 
+    def test_get_token_bounds_fuzzy_pos03(self):
+        source_text = 'بعد ما تضاربت المعلومات الاسبوع الماضي عن عدد الجنود ' \
+                      'الاميركيين الذين س يشاركون في بعثة تدريبية ل مكافحة ' \
+                      'الارهاب في الفيليبين, في إطار جهود واشنطن ل مكافحة ' \
+                      'الارهاب في العالم, أفاد أمس مسؤولون عسكريون في مانيلا ' \
+                      'ان نحو 650 جندياً اميركياً س ينضمون تباعاً الى قوات ' \
+                      'فيليبينية ل تعزيز قدرات ها الدفاعية من أجل القضاء ' \
+                      'على جماعة " أبو سياف " التي تربط ها صلات ب تنظيم " ' \
+                      'القاعدة " الذي يتزعم ه اسامة بن لادن, م ما س يتيح ل هم ' \
+                      'الانتقال الى مناطق القتال في جنوب البلاد.'
+        some_list = ['linguistic', 'information']
+        tokenized = [
+            ("بَعْدَ-", some_list, "anything"),
+            ("-ما", some_list, "anything"),
+            ("تَضارَبَت", some_list, "anything"),
+            ("المَعْلُوماتُ", some_list, "anything"),
+            ("الأُسْبُوعَ", some_list, "anything"),
+            ("الماضِيَ", some_list, "anything"),
+            ("عَن", some_list, "anything"),
+            ("عَدَدِ", some_list, "anything"),
+            ("الجُنُودِ", some_list, "anything"),
+            ("الأَمِيرْكِيِّينَ", some_list, "anything"),
+            ("الَّذِينَ", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-يُشارِكُونَ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("بِعْثَةٍ", some_list, "anything"),
+            ("تَدْرِيبِيَّةٍ", some_list, "anything"),
+            ("لِ-", some_list, "anything"),
+            ("-مُكافَحَةِ", some_list, "anything"),
+            ("الإِرْهابِ", some_list, "anything"),
+            ("الفِيلِيبِّين", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("إِطارِ", some_list, "anything"),
+            ("جُهُودِ", some_list, "anything"),
+            ("واشِنْطُن", some_list, "anything"),
+            ("لِ-", some_list, "anything"),
+            ("-مُكافَحَةِ", some_list, "anything"),
+            ("الإِرْهابِ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("العالَمِ", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("أَفادَ", some_list, "anything"),
+            ("أَمْسِ", some_list, "anything"),
+            ("مَسْؤُولُونَ", some_list, "anything"),
+            ("عَسْكَرِيُّونَ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("مانِيلا", some_list, "anything"),
+            ("أَنَّ", some_list, "anything"),
+            ("نَحْوَ", some_list, "anything"),
+            ("650", some_list, "anything"),
+            ("جُنْدِيّاً", some_list, "anything"),
+            ("أَمِيرْكِيّاً", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-يَنْضَمُّونَ", some_list, "anything"),
+            ("تِباعاً", some_list, "anything"),
+            ("إِلَى", some_list, "anything"),
+            ("قُوّاتٍ", some_list, "anything"),
+            ("فِلِيبِّينِيَّةٍ", some_list, "anything"),
+            ("لِ-", some_list, "anything"),
+            ("-تَعْزِيزِ", some_list, "anything"),
+            ("قُدْراتِ-", some_list, "anything"),
+            ("-ها", some_list, "anything"),
+            ("الدِفاعِيَّةِ", some_list, "anything"),
+            ("مِن", some_list, "anything"),
+            ("أَجْلِ", some_list, "anything"),
+            ("القَضاءِ", some_list, "anything"),
+            ("عَلَى", some_list, "anything"),
+            ("جَماعَةِ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("أَبُو", some_list, "anything"),
+            ("سَيّاف", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("الَّتِي", some_list, "anything"),
+            ("تَرْبِطُ-", some_list, "anything"),
+            ("-ها", some_list, "anything"),
+            ("صِلاتٌ", some_list, "anything"),
+            ("بِ-", some_list, "anything"),
+            ("-تَنْظِيمِ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("القاعِدَةِ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("الَّذِي", some_list, "anything"),
+            ("يَتَزَعَّمُ-", some_list, "anything"),
+            ("-هُ", some_list, "anything"),
+            ("أُسامَة", some_list, "anything"),
+            ("بِن", some_list, "anything"),
+            ("لادِن", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("مِن-", some_list, "anything"),
+            ("-ما", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-يُتِيحُ", some_list, "anything"),
+            ("لَ-", some_list, "anything"),
+            ("-هُم", some_list, "anything"),
+            ("ال{ِنْتِقالَ", some_list, "anything"),
+            ("إِلَى", some_list, "anything"),
+            ("مَناطِقِ", some_list, "anything"),
+            ("القِتالِ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("جَنُوبِ", some_list, "anything"),
+            ("البِلادِ", some_list, "anything"),
+            (".", some_list, "anything")
+        ]
+        calculated_bounds = get_token_bounds_fuzzy(source_text, tokenized)
+        self.assertIsInstance(calculated_bounds, list)
+        self.assertEqual(len(tokenized), len(calculated_bounds))
+        prev_pos = 0
+        for token_idx, token_bounds in enumerate(calculated_bounds):
+            err_msg = 'Token[{0}] = {1} is wrong! All bounds list = {2}'.format(
+                token_idx, tokenized[token_idx][0], calculated_bounds
+            )
+            self.assertIsInstance(token_bounds, tuple, msg=err_msg)
+            self.assertEqual(len(token_bounds), 2, msg=err_msg)
+            token_start, token_end = token_bounds
+            self.assertLess(token_start, token_end, msg=err_msg)
+            self.assertGreaterEqual(token_start, prev_pos, msg=err_msg)
+            self.assertLessEqual(token_end, len(source_text), msg=err_msg)
+            if token_start > prev_pos:
+                space_text = source_text[prev_pos:token_start].strip()
+                self.assertEqual('', space_text, msg=err_msg)
+            token_text = source_text[token_start:token_end]
+            self.assertGreater(len(token_text), 0, msg=err_msg)
+            self.assertEqual(token_text, token_text.strip(), msg=err_msg)
+            prev_pos = token_end
+        self.assertEqual('', source_text[prev_pos:].strip())
+
+    def test_get_token_bounds_fuzzy_pos04(self):
+        source_text = 'و في الاجمال, س يشارك 500 جندي اميركي في عمليات " ' \
+                      'دعم و صيانة ", بينما س يسمح ل لاخرين, و هم اعضاء في ' \
+                      'القوات الخاصة, ب مشاركة الجنود الفيليبينيين أحياناً ' \
+                      'في مطاردة المتطرفين الاسلاميين في جزيرة باسيلان في ' \
+                      'جنوب البلاد.'
+        some_list = ['linguistic', 'information']
+        tokenized = [
+            ("وَ-", some_list, "anything"),
+            ("-فِي", some_list, "anything"),
+            ("الإِجْمالِ", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-يُشارِكُ", some_list, "anything"),
+            ("500", some_list, "anything"),
+            ("جُنْدِيٍّ", some_list, "anything"),
+            ("أَمِيرْكِيٍّ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("عَمَلِيّاتِ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("دَعْمٍ", some_list, "anything"),
+            ("وَ-", some_list, "anything"),
+            ("-صِيانَةٍ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("بَيْنَما", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-يُسْمَحُ", some_list, "anything"),
+            ("لِ-", some_list, "anything"),
+            ("-الآخِرِينَ", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("وَ-", some_list, "anything"),
+            ("-هُم", some_list, "anything"),
+            ("أَعْضاءٌ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("القُوّاتِ", some_list, "anything"),
+            ("الخاصَّةِ", some_list, "anything"),
+            (",", some_list, "anything"),
+            ("بِ-", some_list, "anything"),
+            ("-مُشارَكَةِ", some_list, "anything"),
+            ("الجُنُودِ", some_list, "anything"),
+            ("الفِلِيبِّينِيِّينَ", some_list, "anything"),
+            ("أَحْياناً", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("مُطارَدَةِ", some_list, "anything"),
+            ("المُتَطَرِّفِينَ", some_list, "anything"),
+            ("الإِسْلامِيِّينَ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("جَزِيرَةِ", some_list, "anything"),
+            ("باسِيلان", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("جَنُوبِ", some_list, "anything"),
+            ("البِلادِ", some_list, "anything"),
+            (".", some_list, "anything")
+        ]
+        calculated_bounds = get_token_bounds_fuzzy(source_text, tokenized)
+        self.assertIsInstance(calculated_bounds, list)
+        self.assertEqual(len(tokenized), len(calculated_bounds))
+        prev_pos = 0
+        for token_idx, token_bounds in enumerate(calculated_bounds):
+            err_msg = 'Token[{0}] = {1} is wrong! All bounds list = {2}'.format(
+                token_idx, tokenized[token_idx][0], calculated_bounds
+            )
+            self.assertIsInstance(token_bounds, tuple, msg=err_msg)
+            self.assertEqual(len(token_bounds), 2, msg=err_msg)
+            token_start, token_end = token_bounds
+            self.assertLess(token_start, token_end, msg=err_msg)
+            self.assertGreaterEqual(token_start, prev_pos, msg=err_msg)
+            self.assertLessEqual(token_end, len(source_text), msg=err_msg)
+            if token_start > prev_pos:
+                space_text = source_text[prev_pos:token_start].strip()
+                self.assertEqual('', space_text, msg=err_msg)
+            token_text = source_text[token_start:token_end]
+            self.assertGreater(len(token_text), 0, msg=err_msg)
+            self.assertEqual(token_text, token_text.strip(), msg=err_msg)
+            prev_pos = token_end
+        self.assertEqual('', source_text[prev_pos:].strip())
+
+    def test_get_token_bounds_fuzzy_pos05(self):
+        source_text = 'و أضاف : " ان هما لجنتان فنيتان س تناقشان وقفاً ' \
+                      'ل لنار في جبال النوبة فقط...ان ها ليست محادثات سلام ".'
+        some_list = ['linguistic', 'information']
+        tokenized = [
+            ("وَ-", some_list, "anything"),
+            ("-أَضافَ", some_list, "anything"),
+            (":", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            ("إِنَّ-", some_list, "anything"),
+            ("-هُما", some_list, "anything"),
+            ("لَجْنَتانِ", some_list, "anything"),
+            ("فَنِّيَّتانِ", some_list, "anything"),
+            ("سَ-", some_list, "anything"),
+            ("-تُناقِشانِ", some_list, "anything"),
+            ("وَقْفاً", some_list, "anything"),
+            ("لِ-", some_list, "anything"),
+            ("-النارِ", some_list, "anything"),
+            ("فِي", some_list, "anything"),
+            ("جِبالِ", some_list, "anything"),
+            ("النوبة", some_list, "anything"),
+            ("فَقَط", some_list, "anything"),
+            (".", some_list, "anything"),
+            (".", some_list, "anything"),
+            (".", some_list, "anything"),
+            ("إِنَّ-", some_list, "anything"),
+            ("-ها", some_list, "anything"),
+            ("لَيْسَت", some_list, "anything"),
+            ("مُحادَثاتُ", some_list, "anything"),
+            ("سَلامٍ", some_list, "anything"),
+            ("\"", some_list, "anything"),
+            (".", some_list, "anything")
+        ]
+        calculated_bounds = get_token_bounds_fuzzy(source_text, tokenized)
+        self.assertIsInstance(calculated_bounds, list)
+        self.assertEqual(len(tokenized), len(calculated_bounds))
+        prev_pos = 0
+        for token_idx, token_bounds in enumerate(calculated_bounds):
+            err_msg = 'Token[{0}] = {1} is wrong! All bounds list = {2}'.format(
+                token_idx, tokenized[token_idx][0], calculated_bounds
+            )
+            self.assertIsInstance(token_bounds, tuple, msg=err_msg)
+            self.assertEqual(len(token_bounds), 2, msg=err_msg)
+            token_start, token_end = token_bounds
+            self.assertLess(token_start, token_end, msg=err_msg)
+            self.assertGreaterEqual(token_start, prev_pos, msg=err_msg)
+            self.assertLessEqual(token_end, len(source_text), msg=err_msg)
+            if token_start > prev_pos:
+                space_text = source_text[prev_pos:token_start].strip()
+                self.assertEqual('', space_text, msg=err_msg)
+            token_text = source_text[token_start:token_end]
+            self.assertGreater(len(token_text), 0, msg=err_msg)
+            self.assertEqual(token_text, token_text.strip(), msg=err_msg)
+            prev_pos = token_end
+        self.assertEqual('', source_text[prev_pos:].strip())
+
     def test_get_language_by_filename_pos01(self):
         src_name = os.path.join('data', 'files', 'data', 'arabic',
                                 'annotations', 'nw', 'ann', '00',
@@ -948,6 +1227,241 @@ class TestUtils(unittest.TestCase):
             'أب'
         ]
         self.assertFalse(is_item_in_sequence(re_for_special_token, sequence))
+
+    def test_insert_new_bounds_pos01(self):
+        new_bounds = (0, 5)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(0, 5), (7, 9), (13, 20), (27, 32)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_pos02(self):
+        new_bounds = (0, 7)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(0, 9), (13, 20), (27, 32)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_pos03(self):
+        new_bounds = (34, 40)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(7, 9), (13, 20), (27, 32), (34, 40)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_pos04(self):
+        new_bounds = (11, 12)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(7, 9), (11, 12), (13, 20), (27, 32)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_pos05(self):
+        new_bounds = (11, 13)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(7, 9), (11, 20), (27, 32)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_pos06(self):
+        new_bounds = (8, 13)
+        old_bounds_list = [(7, 9), (13, 20), (27, 32)]
+        true_bounds_list = [(7, 20), (27, 32)]
+        calculated_bounds_list = insert_new_bounds(new_bounds, old_bounds_list)
+        self.assertEqual(true_bounds_list, calculated_bounds_list)
+
+    def test_insert_new_bounds_neg01(self):
+        new_bounds = (8, 13)
+        old_bounds_list = [(7, 9), (13, 20), (27, 27)]
+        with self.assertRaises(ValueError):
+            _ = insert_new_bounds(new_bounds, old_bounds_list)
+
+    def test_insert_new_bounds_neg02(self):
+        new_bounds = (8, 13)
+        old_bounds_list = [(7, 9), (9, 20), (27, 32)]
+        with self.assertRaises(ValueError):
+            _ = insert_new_bounds(new_bounds, old_bounds_list)
+
+    def test_calculate_distance_pos01(self):
+        syntax1 = 'PV+PVSUFF_SUBJ:2MP'
+        syntax2 = 'PV+PVSUFF_SUBJ:2MP'
+        self.assertEqual(0, calculate_distance(syntax1, syntax2))
+
+    def test_calculate_distance_pos02(self):
+        syntax1 = 'PV+PVSUFF_SUBJ:2MP'
+        syntax2 = 'PV'
+        self.assertEqual(2, calculate_distance(syntax1, syntax2))
+
+    def test_calculate_distance_pos03(self):
+        syntax1 = 'PP-TMP'
+        syntax2 = 'SBAR-PRD'
+        self.assertEqual(2 + 7 * 10, calculate_distance(syntax1, syntax2))
+
+    def test_calculate_distance_pos04(self):
+        syntax1 = 'VBD'
+        syntax2 = 'WRB'
+        self.assertEqual(2 + 3 * 10, calculate_distance(syntax1, syntax2))
+
+    def test_calculate_distance_pos05(self):
+        syntax1 = 'DET+NOUN+CASE_DEF_GEN'
+        syntax2 = 'DET+NOUN+CASE_DEF_ACC'
+        self.assertEqual(2 + 3, calculate_distance(syntax1, syntax2))
+
+    def test_unite_overlapped_bounds_pos01(self):
+        source_bounds = [(0, 5), (6, 11), (13, 20)]
+        true_bounds = [(0, 5), (6, 11), (13, 20)]
+        calculated_bounds = unite_overlapped_bounds(source_bounds)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_unite_overlapped_bounds_pos02(self):
+        source_bounds = [(0, 5), (4, 11), (13, 20)]
+        true_bounds = [(0, 11), (13, 20)]
+        calculated_bounds = unite_overlapped_bounds(source_bounds)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_unite_overlapped_bounds_pos03(self):
+        source_bounds = [(0, 5), (6, 11), (11, 20)]
+        true_bounds = [(0, 5), (6, 20)]
+        calculated_bounds = unite_overlapped_bounds(source_bounds)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_unite_overlapped_bounds_neg01(self):
+        source_bounds = [(0, 5), (6, 11), (5, 20)]
+        with self.assertRaises(ValueError):
+            _ = unite_overlapped_bounds(source_bounds)
+
+    def test_check_bounds_pos01(self):
+        source_text = 'With their unique charm, these well-known cartoon ' \
+                      'images once again caused Hong Kong to be a focus of ' \
+                      'worldwide attention.'
+        source_bounds = [
+            (0, 4),  # With
+            (5, 10),  # their
+            (11, 17),  # unique
+            (18, 23),  # charm
+            (23, 24),  # ,
+            (25, 30),  # these
+            (31, 35),  # well
+            (35, 36),  # -
+            (36, 41),  # known
+            (42, 49),  # cartoon
+            (50, 56),  # images
+            (57, 61),  # once
+            (62, 67),  # again
+            (68, 74),  # caused
+            (75, 79),  # Hong
+            (80, 84),  # Kong
+            (85, 87),  # to
+            (88, 90),  # be
+            (91, 92),  # a
+            (93, 98),  # focus
+            (99, 101),  # of
+            (102, 111),  # worldwide
+            (112, 121),  # attention
+            (121, 122)  # .
+        ]
+        res = check_bounds(text=source_text, bounds=source_bounds)
+        self.assertEqual('', res)
+
+    def test_check_bounds_pos02(self):
+        source_text = 'With their unique charm, these well-known cartoon ' \
+                      'images once again caused Hong Kong to be a focus of ' \
+                      'worldwide attention.'
+        source_bounds = [
+            (0, 4),  # With
+            (5, 10),  # their
+            (11, 17),  # unique
+            (18, 23),  # charm
+            (23, 24),  # ,
+            (25, 30),  # these
+            (31, 35),  # well
+            (35, 36),  # -
+            (36, 41),  # known
+            (42, 49),  # cartoon
+            (50, 56),  # images
+            (57, 61),  # once
+            (62, 67),  # again
+            (68, 74),  # caused
+            (75, 79),  # Hong
+            (80, 84),  # Kong
+            (85, 87),  # to
+            (88, 90),  # be
+            (91, 92),  # a
+            (93, 98),  # focus
+            (99, 101),  # of
+            (102, 111),  # worldwide
+            (112, 121),  # attention
+            (121, 132)  # .
+        ]
+        res = check_bounds(text=source_text, bounds=source_bounds)
+        self.assertGreater(len(res), 0)
+
+    def test_check_bounds_pos03(self):
+        source_text = 'With their unique charm, these well-known cartoon ' \
+                      'images once again caused Hong Kong to be a focus of ' \
+                      'worldwide attention.'
+        source_bounds = [
+            (0, 4),  # With
+            (5, 10),  # their
+            (11, 17),  # unique
+            (18, 23),  # charm
+            (23, 24),  # ,
+            (25, 30),  # these
+            (29, 35),  # well
+            (35, 36),  # -
+            (36, 41),  # known
+            (42, 49),  # cartoon
+            (50, 56),  # images
+            (57, 61),  # once
+            (62, 67),  # again
+            (68, 74),  # caused
+            (75, 79),  # Hong
+            (80, 84),  # Kong
+            (85, 87),  # to
+            (88, 90),  # be
+            (91, 92),  # a
+            (93, 98),  # focus
+            (99, 101),  # of
+            (102, 111),  # worldwide
+            (112, 121),  # attention
+            (121, 122)  # .
+        ]
+        res = check_bounds(text=source_text, bounds=source_bounds)
+        self.assertGreater(len(res), 0)
+
+    def test_find_subword_bounds_pos01(self):
+        word = '12345'
+        subwords = ['1', '2', '3', '4', '5']
+        true_bounds = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]
+        calculated_bounds, _ = find_subword_bounds(word, subwords)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_find_subword_bounds_pos02(self):
+        word = '12345'
+        subwords = ['1', '2', '3', '4a', '5']
+        true_bounds = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]
+        calculated_bounds, _ = find_subword_bounds(word, subwords)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_find_subword_bounds_pos03(self):
+        word = '1234a5'
+        subwords = ['1', '2', '3', '4', '5']
+        true_bounds = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 6)]
+        calculated_bounds, _ = find_subword_bounds(word, subwords)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_find_subword_bounds_pos04(self):
+        word = '1234a5'
+        subwords = ['1', '2', '3', '4b', '5']
+        true_bounds = [(0, 1), (1, 2), (2, 3), (3, 5), (5, 6)]
+        calculated_bounds, _ = find_subword_bounds(word, subwords)
+        self.assertEqual(true_bounds, calculated_bounds)
+
+    def test_find_subword_bounds_neg01(self):
+        word = '1234'
+        subwords = ['1', '2', '3', '4', '5']
+        with self.assertRaises(ValueError):
+            _ = find_subword_bounds(word, subwords)
 
 
 if __name__ == '__main__':
