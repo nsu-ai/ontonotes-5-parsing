@@ -1177,3 +1177,45 @@ def load_ontonotes5_from_json(file_name: str) -> Dict[
                 )
                 raise ValueError(err_msg)
     return prepared_data
+
+
+def get_language_frequencies(
+        data: List[Dict[str, Union[str, Dict[str, Tuple[int, int]]]]]
+) -> List[Tuple[str, int]]:
+    languages_dict = dict()
+    for sample_idx, sample_data in enumerate(data):
+        if 'language' not in sample_data:
+            raise ValueError('Sample {0} is wrong! The "language" key is '
+                             'not found!'.format(sample_idx))
+        cur_lang = sample_data['language']
+        languages_dict[cur_lang] = languages_dict.get(cur_lang, 0) + 1
+    languages = []
+    for cur_lang in languages_dict:
+        languages.append((cur_lang, languages_dict[cur_lang]))
+    return sorted(languages, key=lambda it: (-it[1], it[0]))
+
+
+def get_entity_frequencies(
+        data: List[Dict[str, Union[str, Dict[str, Tuple[int, int]]]]],
+        language: str = ''
+) -> List[Tuple[str, int]]:
+    entities_dict = dict()
+    for sample_idx, sample_data in enumerate(data):
+        if 'language' not in sample_data:
+            raise ValueError('Sample {0} is wrong! The "language" key is '
+                             'not found!'.format(sample_idx))
+        if 'entities' not in sample_data:
+            raise ValueError('Sample {0} is wrong! The "entities" key is '
+                             'not found!'.format(sample_idx))
+        cur_lang = sample_data['language']
+        cur_entities = sample_data['entities']
+        if (len(language) > 0) and (language != cur_lang):
+            continue
+        for entity_type in cur_entities:
+            entity_bounds = cur_entities[entity_type]
+            entities_dict[entity_type] = entities_dict.get(entity_type, 0) + \
+                                         len(entity_bounds)
+    entities = []
+    for entity_type in entities_dict:
+        entities.append((entity_type, entities_dict[entity_type]))
+    return sorted(entities, key=lambda it: (-it[1], it[0]))

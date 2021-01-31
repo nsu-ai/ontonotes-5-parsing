@@ -164,7 +164,7 @@ You can see a small fragment of generated result in the JSON format below:
 Also, if you want to train a machine learning algorithm which understands morphology or syntax, then we can get some problem with morphological and syntactical annotations in Ontonotes 5: there are many various morphological and syntactical tags in some texts, especially in Arabic, and these tags describe small nuances of linguistics. But this fact highly extends the number of classes if we solve the linguistic analysis problem as a classification task. You can use a special command to reduce the linguistic classes number (this command unites low-frequent linguistic tags with similar ones, which are more frequent):
 
 ```shell
-reducen_entities \
+reduce_entities \
     -s /path/to/directory/with/parsing/result/ontonotes5.json \
     -d /path/to/directory/with/parsing/result/ontonotes5_reduced.json \
     -n 50
@@ -177,6 +177,19 @@ where:
 - `/path/to/directory/with/parsing/result/ontonotes5_reduced.json` is the path to the analogous JSON file, into which all Ontonotes 5.0 data will be written after linguistic entities reduction.
 
 - `50` is a maximal number of linguistic entity classes (such as part-of-speech tags, syntactical tags in a dependency tree, or named entities), which will be obtained after reduction. This value can be any integer value greater than 2.
+
+### Printing information about parsed Ontonotes 5.0
+
+The abovementioned script for parsing `ontonotes5_to_json` not only parses the specified corpus but shows statistics about Ontonotes 5.0 after parsing ends. But if you want to recollect these statistics a long time after parsing, then you can run a special script for statistics printing:
+
+```shell
+show_statistics \
+    -s /path/to/directory/with/parsing/result/ontonotes5.json
+```
+
+where:
+
+- `/path/to/directory/with/parsing/result/ontonotes5.json` is the path to the JSON file with source Ontonotes 5.0 data (this file can be created using the `ontonotes5_to_json` command and re-built using the `reduce_entities` command, as mentioned above).
 
 ## Breaking Changes
 

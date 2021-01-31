@@ -62,7 +62,8 @@ setup(
     entry_points={
         'console_scripts': [
             'ontonotes5_to_json = ontonotes5_to_json:main',
-            'reduce_entities = reduce_entities:main'
+            'reduce_entities = reduce_entities:main',
+            'show_statistics = show_statistics:main'
         ]
     }
 )
