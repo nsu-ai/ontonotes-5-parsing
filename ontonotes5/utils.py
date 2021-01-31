@@ -649,6 +649,9 @@ def parse_file(onf_name: str, src_name_for_log: str = '') -> \
                     restart_counter += 1
                     if restart_counter > number_of_tokenization_restarts:
                         break
+            if can_tokenize:
+                if len(check_bounds(plain_text, bounds_of_tokens)) > 0:
+                    can_tokenize = False
         if not can_tokenize:
             ok = False
             break
