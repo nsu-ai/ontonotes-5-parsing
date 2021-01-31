@@ -1154,10 +1154,24 @@ def load_ontonotes5_from_json(file_name: str) -> Dict[
                         if end_pos > len(cur_sample['text']):
                             raise ValueError(err_msg)
                         span_text = cur_sample['text'][start_pos:end_pos]
+                        err_msg = 'Sample {0} of the {1} part in the file ' \
+                                  '"{2}" contains wrong data! Bounds of {3} ' \
+                                  'in the {4} are specified incorrectly! ' \
+                                  'Item {5} in the bounds list {6} is ' \
+                                  'inadmissible, because its text is ' \
+                                  'empty.'.format(
+                            sample_idx, data_part, file_name,
+                            entity_type, entity_class,
+                            cur_bounds, old_bounds_of_spans
+                        )
                         if len(span_text.strip()) == 0:
                             raise ValueError(err_msg)
-                        if span_text != span_text.strip():
-                            raise ValueError(err_msg)
+                        stripped_span_text = span_text.strip()
+                        if span_text != stripped_span_text:
+                            found_idx = span_text.find(stripped_span_text)
+                            if found_idx > 0:
+                                start_pos += found_idx
+                                end_pos = start_pos + len(stripped_span_text)
                         prepared_bounds.append((start_pos, end_pos))
                         prev_pos = end_pos
                         if end_pos > max_end_pos:
