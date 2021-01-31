@@ -193,6 +193,8 @@ where:
 
 ## Breaking Changes
 
+**Breaking changes in version 0.0.3**
+- documentation has been updated.
 
 **Breaking changes in version 0.0.2**
 - tokenization bug for Arabic texts has been fixed.

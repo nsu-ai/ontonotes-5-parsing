@@ -24,8 +24,7 @@ specified as dictionaries too, where each dictionary describes labels
 bounds in the corresponded text.
 
 You can read more detailed information about this Ontonotes 5 parser
-in the [small documentation](https://github.com/nsu-ai/
-ontonotes-5-parsing/blob/master/readme.md)
+in the small documentation https://github.com/nsu-ai/ontonotes-5-parsing/blob/master/readme.md
 '''
 
 setup(
