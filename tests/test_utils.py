@@ -1429,6 +1429,40 @@ class TestUtils(unittest.TestCase):
         res = check_bounds(text=source_text, bounds=source_bounds)
         self.assertGreater(len(res), 0)
 
+    def test_check_bounds_pos04(self):
+        source_text = 'With their unique charm, these well-known cartoon ' \
+                      'images once again caused Hong Kong to be a focus of ' \
+                      'worldwide attention.'
+        source_bounds = [
+            (0, 4),  # With
+            (4, 5),
+            (5, 10),  # their
+            (11, 17),  # unique
+            (18, 23),  # charm
+            (23, 24),  # ,
+            (25, 30),  # these
+            (31, 35),  # well
+            (35, 36),  # -
+            (36, 41),  # known
+            (42, 49),  # cartoon
+            (50, 56),  # images
+            (57, 61),  # once
+            (62, 67),  # again
+            (68, 74),  # caused
+            (75, 79),  # Hong
+            (80, 84),  # Kong
+            (85, 87),  # to
+            (88, 90),  # be
+            (91, 92),  # a
+            (93, 98),  # focus
+            (99, 101),  # of
+            (102, 111),  # worldwide
+            (112, 121),  # attention
+            (121, 122)  # .
+        ]
+        res = check_bounds(text=source_text, bounds=source_bounds)
+        self.assertGreater(len(res), 0)
+
     def test_find_subword_bounds_pos01(self):
         word = '12345'
         subwords = ['1', '2', '3', '4', '5']

@@ -429,6 +429,13 @@ def check_bounds(text: str,
         if end_pos > len(text):
             res = err_msg
             break
+        span_text = text[start_pos:end_pos]
+        if len(span_text.strip()) == 0:
+            res = err_msg
+            break
+        if span_text != span_text.strip():
+            res = err_msg
+            break
         prev_pos = end_pos
     return res
 
@@ -626,7 +633,8 @@ def parse_file(onf_name: str, src_name_for_log: str = '') -> \
                         insertion_cost=insertion_cost,
                         deletion_cost=deletion_cost
                     )
-                    can_tokenize = True
+                    can_tokenize = (check_bounds(plain_text,
+                                                 bounds_of_tokens) == '')
                 except:
                     can_tokenize = False
                 restart_counter += 1
@@ -643,15 +651,13 @@ def parse_file(onf_name: str, src_name_for_log: str = '') -> \
                             insertion_cost=insertion_cost,
                             deletion_cost=deletion_cost
                         )
-                        can_tokenize = True
+                        can_tokenize = (check_bounds(plain_text,
+                                                     bounds_of_tokens) == '')
                     except:
                         can_tokenize = False
                     restart_counter += 1
                     if restart_counter > number_of_tokenization_restarts:
                         break
-            if can_tokenize:
-                if len(check_bounds(plain_text, bounds_of_tokens)) > 0:
-                    can_tokenize = False
         if not can_tokenize:
             ok = False
             break
