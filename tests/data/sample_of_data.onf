@@ -204,6 +204,62 @@ Leaves:
 
 Plain sentence:
 ---------------
+    What was the, purpose and goal of this campaign ?
+
+Treebanked sentence:
+--------------------
+    What was the purpose , purpose and goal of this campaign *T*-1 ?
+
+Speaker information:
+--------------------
+    name: Luo_huanzhang
+    start time: 356.971
+    stop time: 362.145
+
+Tree:
+-----
+    (TOP (SBARQ (WHNP-1 (WP What))
+                (SQ (VBD was)
+                    (NP-SBJ (NP (DT the)
+                                (EDITED (NN purpose))
+                                (, ,)
+                                (NN purpose)
+                                (CC and)
+                                (NN goal))
+                            (PP (IN of)
+                                (NP (DT this)
+                                    (NN campaign))))
+                    (NP-PRD (-NONE- *T*-1)))
+                (. ?)))
+
+Leaves:
+-------
+    0   What
+    1   was
+           sense: be-v.2
+           prop:  be.01
+            v          * -> 1:0,  was
+            ARG1       * -> 2:2,  the purpose , purpose and goal of this campaign
+            ARG2       * -> 11:0, *T*-1 -> 0:1, What
+    2   the
+           coref: IDENT        193   2-10   the purpose , purpose and goal of this campaign
+    3   purpose
+    4   ,
+    5   purpose
+    6   and
+    7   goal
+    8   of
+    9   this
+           coref: IDENT        151   9-10   this campaign
+    10  campaign
+    11  *T*-1
+    12  ?
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
     -LRB-و ص ف, رويترز, أب-RRB-
 
 Treebanked sentence:

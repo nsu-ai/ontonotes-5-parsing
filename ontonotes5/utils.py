@@ -449,7 +449,7 @@ def is_item_in_sequence(re_for_item: Pattern, sequence: List[str]) -> bool:
 def parse_file(onf_name: str, src_name_for_log: str = '') -> \
         Tuple[List[Dict[str, Dict[str, Tuple[int, int]]]], str]:
     number_of_tokenization_restarts = 5
-    special_token_re = re.compile(r'^\-[A-Z]+\-$')
+    special_token_re = re.compile(r'^(\-[A-Z]+\-|EDITED)$')
     file_name_for_log = onf_name if (len(src_name_for_log) == 0) \
         else src_name_for_log
     with codecs.open(onf_name, mode='r', encoding='utf-8',
@@ -1138,20 +1138,16 @@ def load_ontonotes5_from_json(file_name: str) -> Dict[
                             raise ValueError(err_msg)
                         start_pos = cur_bounds[0]
                         end_pos = cur_bounds[1]
-                        # if start_pos > end_pos:
-                        #     raise ValueError(err_msg)
-                        # if start_pos <= end_pos:
-                        #     end_pos = start_pos + 1
-                        # if start_pos <= prev_pos:
-                        #     prepared_bounds[-1] = (
-                        #         prepared_bounds[-1][0],
-                        #         end_pos
-                        #     )
-                        # else:
-                        #     prepared_bounds.append((start_pos, end_pos))
                         if start_pos >= end_pos:
                             raise ValueError(err_msg)
                         if start_pos <= prev_pos:
+                            raise ValueError(err_msg)
+                        if end_pos > len(cur_sample['text']):
+                            raise ValueError(err_msg)
+                        span_text = cur_sample['text'][start_pos:end_pos]
+                        if len(span_text.strip()) == 0:
+                            raise ValueError(err_msg)
+                        if span_text != span_text.strip():
                             raise ValueError(err_msg)
                         prepared_bounds.append((start_pos, end_pos))
                         prev_pos = end_pos

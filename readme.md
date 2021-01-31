@@ -7,8 +7,7 @@
 
 [Ontonotes 5.0](https://catalog.ldc.upenn.edu/LDC2013T19) is very useful for experiments with NER, i.e. Named Entity Recognition. There are many papers devoted to various NER architectures, and these architectures are checked on Ontonotes 5 (for example, see [Papers With Code](https://paperswithcode.com/sota/named-entity-recognition-ner-on-ontonotes-v5)). Besides, Ontonotes 5 includes three languages (English, Arabic, and Chinese), and this fact increases interest to use it in experiments with multi-lingual NER. But the source format of Ontonotes 5 is very intricate, in my view. Conformably, **the goal of this project** is the creation of a special parser to transform Ontonotes 5 into a simple JSON format. In this format, each annotated sentence is represented as a dictionary with five keys: text, morphology, syntax, entities, and language. In their's turn, morphology, syntax, and entities are specified as dictionaries too, where each dictionary describes labels (part-of-speech labels, syntactical tags, or entity classes) and their bounds in the corresponded text.
 
-Installing
-----------
+## Installing
 
 
 For installation you need to Python 3.6 or later. To install this project on your local machine, you should run the following commands in the Terminal:
@@ -33,8 +32,9 @@ Also, you can install the **Ontonotes-5-Parsing** from the [PyPi](https://pypi.o
 pip install ontonotes-5-parsing
 ```
 
-Usage
------
+## Usage
+
+### The building of JSON-formatted dataset
 
 **Ontonotes-5-Parsing** can be used as a Python package in your projects after its installing. But the main use case is using as a command-line tool. For transforming source Ontonotes 5 data to the JSON format, you have to run such command:
 
@@ -159,7 +159,34 @@ You can see a small fragment of generated result in the JSON format below:
 }
 ```
 
-License
--------
+### The linguistic entities reduction in JSON-formatted dataset
+
+Also, if you want to train a machine learning algorithm which understands morphology or syntax, then we can get some problem with morphological and syntactical annotations in Ontonotes 5: there are many various morphological and syntactical tags in some texts, especially in Arabic, and these tags describe small nuances of linguistics. But this fact highly extends the number of classes if we solve the linguistic analysis problem as a classification task. You can use a special command to reduce the linguistic classes number (this command unites low-frequent linguistic tags with similar ones, which are more frequent):
+
+```shell
+reducen_entities \
+    -s /path/to/directory/with/parsing/result/ontonotes5.json \
+    -d /path/to/directory/with/parsing/result/ontonotes5_reduced.json \
+    -n 50
+```
+
+where:
+
+- `/path/to/directory/with/parsing/result/ontonotes5.json` is the path to the JSON file with source Ontonotes 5.0 data (this file can be created using the abovementioned `ontonotes5_to_json` command).
+
+- `/path/to/directory/with/parsing/result/ontonotes5_reduced.json` is the path to the analogous JSON file, into which all Ontonotes 5.0 data will be written after linguistic entities reduction.
+
+- `50` is a maximal number of linguistic entity classes (such as part-of-speech tags, syntactical tags in a dependency tree, or named entities), which will be obtained after reduction. This value can be any integer value greater than 2.
+
+## Breaking Changes
+
+
+**Breaking changes in version 0.0.2**
+- tokenization bug for Arabic texts has been fixed.
+
+**Breaking changes in version 0.0.1**
+- initial (alpha) version of the **Ontonotes-5-Parsing** has been released.
+
+## License
 
 The **Ontonotes-5-Parsing** (`ontonotes-5-parsing`) is Apache 2.0 - licensed.

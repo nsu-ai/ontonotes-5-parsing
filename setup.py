@@ -22,6 +22,10 @@ language. In their's turn, morphology, syntax, and entities are
 specified as dictionaries too, where each dictionary describes labels
 (part-of-speech labels, syntactical tags, or entity classes) and their
 bounds in the corresponded text.
+
+You can read more detailed information about this Ontonotes 5 parser
+in the [small documentation](https://github.com/nsu-ai/
+ontonotes-5-parsing/blob/master/readme.md)
 '''
 
 setup(
@@ -50,10 +54,15 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     keywords=['ontonotes', 'ontonotes5', 'ontonotes-5', 'ner', 'nlp',
-              'multi-lingual'],
-    install_requires=['tqdm', 'numpy'],
+              'multi-lingual', 'named-entity-recognizer',
+              'named-entity-recognition'],
+    install_requires=['tqdm>=4.43.0', 'numpy>=1.18.1', 'nltk>=3.5',
+                      'python-Levenshtein>=0.12.0'],
     test_suite='tests',
     entry_points={
-        'console_scripts': ['ontonotes5_to_json = ontonotes5_to_json:main']
+        'console_scripts': [
+            'ontonotes5_to_json = ontonotes5_to_json:main',
+            'reduce_entities = reduce_entities:main'
+        ]
     }
 )
