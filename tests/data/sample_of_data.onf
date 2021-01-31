@@ -204,6 +204,62 @@ Leaves:
 
 Plain sentence:
 ---------------
+    What was the, purpose and goal of this campaign ?
+
+Treebanked sentence:
+--------------------
+    What was the purpose , purpose and goal of this campaign *T*-1 ?
+
+Speaker information:
+--------------------
+    name: Luo_huanzhang
+    start time: 356.971
+    stop time: 362.145
+
+Tree:
+-----
+    (TOP (SBARQ (WHNP-1 (WP What))
+                (SQ (VBD was)
+                    (NP-SBJ (NP (DT the)
+                                (EDITED (NN purpose))
+                                (, ,)
+                                (NN purpose)
+                                (CC and)
+                                (NN goal))
+                            (PP (IN of)
+                                (NP (DT this)
+                                    (NN campaign))))
+                    (NP-PRD (-NONE- *T*-1)))
+                (. ?)))
+
+Leaves:
+-------
+    0   What
+    1   was
+           sense: be-v.2
+           prop:  be.01
+            v          * -> 1:0,  was
+            ARG1       * -> 2:2,  the purpose , purpose and goal of this campaign
+            ARG2       * -> 11:0, *T*-1 -> 0:1, What
+    2   the
+           coref: IDENT        193   2-10   the purpose , purpose and goal of this campaign
+    3   purpose
+    4   ,
+    5   purpose
+    6   and
+    7   goal
+    8   of
+    9   this
+           coref: IDENT        151   9-10   this campaign
+    10  campaign
+    11  *T*-1
+    12  ?
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
     -LRB-و ص ف, رويترز, أب-RRB-
 
 Treebanked sentence:
@@ -234,6 +290,84 @@ Leaves:
     6   ,
     7   أب
     8   -RRB-
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Plain sentence:
+---------------
+    و قال الناطق ب اسم الرئاسة ريغوبيرتو تيغلاو : " أخذنا في الاعتبار في تحضيرات نا امكان تكبد هم خسائر ".
+
+Treebanked sentence:
+--------------------
+    وَ- -قالَ الناطِقُ بِ- -{ِسْمِ الرِئاسَةِ ريغوبيرتو تيغلاو : " أَخَذنا * فِي ال{ِعْتِبارِ فِي تَحْضِيراتِ- -نا إِمْكانَ
+    تَكَبُّدِ- -هِم خَسائِرَ " .
+
+Tree:
+-----
+    (TOP (S (CONJ وَ-)
+            (VP (PV+PVSUFF_SUBJ:3MS -قالَ)
+                (NP-SBJ (NP (NP (DET+NOUN+CASE_DEF_NOM الناطِقُ))
+                            (PP (PREP بِ-)
+                                (NP (NOUN+CASE_DEF_GEN -{ِسْمِ)
+                                    (NP (DET+NOUN+NSUFF_FEM_SG+CASE_DEF_GEN الرِئاسَةِ)))))
+                        (NP (NOUN_PROP ريغوبيرتو)
+                            (NOUN_PROP تيغلاو)))
+                (PUNC :)
+                (S (PUNC ")
+                   (VP (PV+PVSUFF_SUBJ:1P أَخَذنا)
+                       (NP-SBJ (-NONE- *))
+                       (PP-CLR (PREP فِي)
+                               (NP (DET+NOUN+CASE_DEF_GEN ال{ِعْتِبارِ)))
+                       (PP (PREP فِي)
+                           (NP (NOUN+NSUFF_FEM_PL+CASE_DEF_GEN تَحْضِيراتِ-)
+                               (NP (POSS_PRON_1P -نا))))
+                       (NP-OBJ (NOUN+CASE_DEF_ACC إِمْكانَ)
+                               (S-NOM (VP (NOUN.VN+CASE_DEF_GEN تَكَبُّدِ-)
+                                          (NP-SBJ (POSS_PRON_3MP -هِم))
+                                          (NP-OBJ (NOUN+CASE_INDEF_ACC خَسائِرَ))))))
+                   (PUNC ")))
+            (PUNC .)))
+
+Leaves:
+-------
+    0   وَ-
+    1   -قالَ
+           prop:  qAl-u.01
+            v          * -> 1:0,  -قالَ
+            ARG0       * -> 2:3,  الناطِقُ بِ- -{ِسْمِ الرِئاسَةِ ريغوبيرتو تيغلاو
+            ARG1       * -> 9:1,  " أَخَذنا * فِي ال{ِعْتِبارِ فِي تَحْضِيراتِ- -نا إِمْكانَ تَكَبُّدِ- -هِم خَسائِرَ "
+    2   الناطِقُ
+           coref: APPOS ATTRIB 132   2-5    الناطِقُ بِ- -{ِسْمِ الرِئاسَةِ
+    3   بِ-
+    4   -{ِسْمِ
+    5   الرِئاسَةِ
+    6   ريغوبيرتو
+           coref: APPOS HEAD   132   6-7    ريغوبيرتو تيغلاو
+           name:  PERSON             6-7    ريغوبيرتو تيغلاو
+    7   تيغلاو
+    8   :
+    9   "
+    10  أَخَذنا
+           prop:  OaxaX-u.16
+            v          * -> 10:0, أَخَذنا
+            ARG0       * -> 11:0, *
+            ARG1       * -> 12:1, فِي ال{ِعْتِبارِ
+            ARGM-LOC   * -> 14:1, فِي تَحْضِيراتِ- -نا
+            ARG2       * -> 17:1, إِمْكانَ تَكَبُّدِ- -هِم خَسائِرَ
+    11  *
+    12  فِي
+    13  ال{ِعْتِبارِ
+    14  فِي
+    15  تَحْضِيراتِ-
+    16  -نا
+    17  إِمْكانَ
+    18  تَكَبُّدِ-
+    19  -هِم
+           coref: IDENT        0     19-19  -هِم
+    20  خَسائِرَ
+    21  "
+    22  .
 
 
 ========================================================================================================================

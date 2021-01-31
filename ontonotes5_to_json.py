@@ -6,54 +6,12 @@ import os
 import random
 import tarfile
 from tempfile import NamedTemporaryFile
-from typing import Dict, List, Tuple, Union
 
-# from tqdm import tqdm
+from tqdm import tqdm
 
 from ontonotes5.utils import parse_file, parse_splitting, check_onf_name
 from ontonotes5.utils import get_language_by_filename
-
-
-def get_language_frequencies(
-        data: List[Dict[str, Union[str, Dict[str, Tuple[int, int]]]]]
-) -> List[Tuple[str, int]]:
-    languages_dict = dict()
-    for sample_idx, sample_data in enumerate(data):
-        if 'language' not in sample_data:
-            raise ValueError('Sample {0} is wrong! The "language" key is '
-                             'not found!'.format(sample_idx))
-        cur_lang = sample_data['language']
-        languages_dict[cur_lang] = languages_dict.get(cur_lang, 0) + 1
-    languages = []
-    for cur_lang in languages_dict:
-        languages.append((cur_lang, languages_dict[cur_lang]))
-    return sorted(languages, key=lambda it: (-it[1], it[0]))
-
-
-def get_entity_frequencies(
-        data: List[Dict[str, Union[str, Dict[str, Tuple[int, int]]]]],
-        language: str = ''
-) -> List[Tuple[str, int]]:
-    entities_dict = dict()
-    for sample_idx, sample_data in enumerate(data):
-        if 'language' not in sample_data:
-            raise ValueError('Sample {0} is wrong! The "language" key is '
-                             'not found!'.format(sample_idx))
-        if 'entities' not in sample_data:
-            raise ValueError('Sample {0} is wrong! The "entities" key is '
-                             'not found!'.format(sample_idx))
-        cur_lang = sample_data['language']
-        cur_entities = sample_data['entities']
-        if (len(language) > 0) and (language != cur_lang):
-            continue
-        for entity_type in cur_entities:
-            entity_bounds = cur_entities[entity_type]
-            entities_dict[entity_type] = entities_dict.get(entity_type, 0) + \
-                                         len(entity_bounds)
-    entities = []
-    for entity_type in entities_dict:
-        entities.append((entity_type, entities_dict[entity_type]))
-    return sorted(entities, key=lambda it: (-it[1], it[0]))
+from ontonotes5.utils import get_language_frequencies, get_entity_frequencies
 
 
 def main():
@@ -69,7 +27,7 @@ def main():
         '-d',
         '--dst',
         dest='dst_file', type=str, required=True,
-        help='The destionation *.json file with texts and their annotations '
+        help='The destination *.json file with texts and their annotations '
              '(named entities, morphology and syntax).'
     )
     parser.add_argument(
@@ -132,8 +90,7 @@ def main():
         err_msg = 'There are no labeled texts with *.onf extension in the ' \
                   '"{0}"!'.format(src_file_name)
         assert number_of_members > 0, err_msg
-        # for cur_name in tqdm(onf_names):
-        for cur_name in onf_names:
+        for cur_name in tqdm(onf_names):
             language = get_language_by_filename(cur_name)
             tmp_name = None
             try:
@@ -183,7 +140,7 @@ def main():
             random.shuffle(data_for_testing)
             res['TESTING'] = data_for_testing
         json.dump(res, fp=fp, ensure_ascii=False, indent=4, sort_keys=True)
-            
+
     print('{0} files are processed.'.format(number_of_members))
     n_errors = len(files_with_errors)
     if n_errors > 0:
@@ -229,7 +186,6 @@ def main():
                     print('      {0:>{1}} {2}'.format(entity_type, max_width,
                                                       entity_freq))
             print('')
-
 
 
 if __name__ == '__main__':

@@ -1,2 +1,4 @@
-numpy
-tqdm
+numpy>=1.18.1
+tqdm>=4.43.0
+python-Levenshtein>=0.12.0
+nltk>=3.5
