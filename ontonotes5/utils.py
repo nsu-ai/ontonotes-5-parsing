@@ -4,9 +4,49 @@ import os
 import re
 from typing import Dict, Pattern, List, Tuple, Union
 
-from Levenshtein import distance, jaro
+from Levenshtein import distance
 from nltk import wordpunct_tokenize
 import numpy as np
+
+
+def tokenize_any_text(s: str) -> List[str]:
+    re_for_cjk = re.compile(
+        "([\uac00-\ud7a3]+|[\u3040-\u30ff]+|[\u4e00-\u9FFF]+)"
+    )
+    ok = True
+    cjk_bounds = []
+    start_pos = 0
+    while ok:
+        search_res = re_for_cjk.search(s[start_pos:])
+        if search_res is None:
+            ok = False
+        elif search_res.start() < 0:
+            ok = False
+        elif search_res.end() <= search_res.start():
+            ok = False
+        else:
+            cjk_bounds.append(
+                (
+                    start_pos + search_res.start(),
+                    start_pos + search_res.end()
+                )
+            )
+            start_pos = start_pos + search_res.end()
+    if len(cjk_bounds) == 0:
+        tokens = wordpunct_tokenize(s)
+    else:
+        tokens = []
+        start_pos = 0
+        for cur in cjk_bounds:
+            if len(s[start_pos:cur[0]].strip()) > 0:
+                tokens += wordpunct_tokenize(s[start_pos:cur[0]].strip())
+            tokens += [s[char_idx:(char_idx + 1)]
+                       for char_idx in range(cur[0], cur[1])]
+            start_pos = cur[1]
+        cur = cjk_bounds[-1]
+        if len(s[cur[1]:].strip()) > 0:
+            tokens += wordpunct_tokenize(s[cur[1]:])
+    return tokens
 
 
 def get_plain_text(all_lines: List[str], start_idx: int, end_idx: int) -> str:
@@ -258,7 +298,7 @@ def get_token_bounds_fuzzy(
             lambda it2: len(it2) > 0,
             map(
                 lambda it1: it1.strip(),
-                wordpunct_tokenize(source_text)
+                tokenize_any_text(source_text)
             )
         )
     ))
@@ -382,12 +422,12 @@ def strip_bounds(text: str,
                  bounds: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     new_bounds = []
     for start_pos, end_pos in bounds:
-        end_pos_ = end_pos - 1
-        while end_pos_ > start_pos:
-            if not text[end_pos_].isspace():
-                break
-            end_pos_ -= 1
-        new_bounds.append((start_pos, end_pos_ + 1))
+        source_token = text[start_pos:end_pos]
+        stripped_token = source_token.strip()
+        start_pos_ = source_token.find(stripped_token)
+        assert start_pos_ >= 0
+        end_pos_ = start_pos_ + len(stripped_token)
+        new_bounds.append((start_pos + start_pos_, start_pos + end_pos_))
     return new_bounds
 
 
@@ -422,19 +462,25 @@ def check_bounds(text: str,
         )
         if start_pos >= end_pos:
             res = err_msg
+            res += ' start_pos={0} >= end_pos={1}'.format(start_pos, end_pos)
             break
         if start_pos < prev_pos:
             res = err_msg
+            res += ' start_pos={0} < prev_pos={1}'.format(start_pos, prev_pos)
             break
         if end_pos > len(text):
             res = err_msg
+            res += ' end_pos={0} > len(text)={1}'.format(end_pos, len(text))
             break
         span_text = text[start_pos:end_pos]
         if len(span_text.strip()) == 0:
             res = err_msg
+            res += ' text[{0}:{1}] is empty!'.format(start_pos, end_pos)
             break
         if span_text != span_text.strip():
             res = err_msg
+            res += ' text[{0}:{1}] != text[{0}:{1}].strip()'.format(start_pos,
+                                                                    end_pos)
             break
         prev_pos = end_pos
     return res
@@ -807,6 +853,7 @@ def parse_file(onf_name: str, src_name_for_log: str = '') -> \
                         len(all_data), lingvo_key, data_key,
                         err_msg2
                     )
+                    err_msg3 += ' Text is {0}'.format(new_data['text'])
                     raise ValueError(err_msg3)
                 new_data[data_key][lingvo_key] = unite_overlapped_bounds(
                     sorted(new_bounds)

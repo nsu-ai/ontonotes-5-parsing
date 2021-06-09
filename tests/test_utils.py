@@ -16,6 +16,7 @@ from ontonotes5.utils import get_language_by_filename
 from ontonotes5.utils import is_item_in_sequence
 from ontonotes5.utils import unite_overlapped_bounds, check_bounds
 from ontonotes5.utils import insert_new_bounds, calculate_distance
+from ontonotes5.utils import tokenize_any_text
 
 
 class TestUtils(unittest.TestCase):
@@ -124,6 +125,13 @@ class TestUtils(unittest.TestCase):
         text = '123,fkj-4fkl'
         source_bounds = [(0, 3), (3, 4), (4, 7), (7, 8), (8, 12)]
         true_bounds = [(0, 3), (3, 4), (4, 7), (7, 8), (8, 12)]
+        calc_bounds = strip_bounds(text, source_bounds)
+        self.assertEqual(true_bounds, calc_bounds)
+
+    def test_strip_bounds_pos06(self):
+        text = '123 fkj 4fkl'
+        source_bounds = [(0, 3), (3, 7), (8, 12)]
+        true_bounds = [(0, 3), (4, 7), (8, 12)]
         calc_bounds = strip_bounds(text, source_bounds)
         self.assertEqual(true_bounds, calc_bounds)
 
@@ -1496,6 +1504,22 @@ class TestUtils(unittest.TestCase):
         subwords = ['1', '2', '3', '4', '5']
         with self.assertRaises(ValueError):
             _ = find_subword_bounds(word, subwords)
+
+    def test_tokenize_any_word_pos01(self):
+        s = 'Hello, world!'
+        words = ['Hello', ',', 'world', '!']
+        self.assertEqual(words, tokenize_any_text(s))
+
+    def test_tokenize_any_word_pos02(self):
+        s = '天地方益権'
+        words = ['天', '地', '方', '益', '権']
+        self.assertEqual(words, tokenize_any_text(s))
+
+    def test_tokenize_any_word_pos03(self):
+        s = 'hello?天地方3 d gh益権, world!'
+        words = ['hello', '?', '天', '地', '方', '3', 'd', 'gh', '益', '権', ',',
+                 'world', '!']
+        self.assertEqual(words, tokenize_any_text(s))
 
 
 if __name__ == '__main__':

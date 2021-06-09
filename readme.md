@@ -193,6 +193,9 @@ where:
 
 ## Breaking Changes
 
+**Breaking changes in version 0.0.4**
+- tokenization bug for hieroglyphic languages has been fixed.
+
 **Breaking changes in version 0.0.3**
 - documentation has been updated.
 
