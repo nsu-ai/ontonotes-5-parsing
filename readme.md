@@ -193,7 +193,7 @@ where:
 
 ## Breaking Changes
 
-**Breaking changes in version 0.0.4**
+**Breaking changes in version 0.0.5**
 - clustering of linguistic entities (syntactical tags, PoS tags) has been improved.
 
 **Breaking changes in version 0.0.4**
