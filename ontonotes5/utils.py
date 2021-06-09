@@ -1047,6 +1047,23 @@ def insert_new_bounds(new_bounds: Tuple[int, int],
 def calculate_distance(lingvo1: str, lingvo2: str) -> int:
     if lingvo1.strip() == lingvo2.strip():
         return 0
+    re_for_alpha = re.compile(r'\w+')
+    search_res = re_for_alpha.search(lingvo1)
+    if search_res is None:
+        has_alpha1 = False
+    elif (search_res.start() >= 0) and (search_res.end() > search_res.start()):
+        has_alpha1 = True
+    else:
+        has_alpha1 = False
+    search_res = re_for_alpha.search(lingvo2)
+    if search_res is None:
+        has_alpha2 = False
+    elif (search_res.start() >= 0) and (search_res.end() > search_res.start()):
+        has_alpha2 = True
+    else:
+        has_alpha2 = False
+    if (has_alpha1 and (not has_alpha2)) or (has_alpha2 and (not has_alpha1)):
+        return (len(lingvo1) + len(lingvo2)) * 10
     re_for_splitting = re.compile('[\.\+\:\-\=]')
     parts1 = list(filter(
         lambda it2: len(it2) > 0,

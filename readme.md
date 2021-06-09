@@ -194,6 +194,9 @@ where:
 ## Breaking Changes
 
 **Breaking changes in version 0.0.4**
+- clustering of linguistic entities (syntactical tags, PoS tags) has been improved.
+
+**Breaking changes in version 0.0.4**
 - tokenization bug for hieroglyphic languages has been fixed.
 
 **Breaking changes in version 0.0.3**

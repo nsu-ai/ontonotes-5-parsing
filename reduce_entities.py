@@ -95,7 +95,6 @@ def main():
         clusters[entity_class] = dict()
         n = min(len(entities), cmd_args.maximal_number_of_enttity_types)
         for entity_type, freq in entities[0:n]:
-            rules[entity_class][entity_type] = entity_type
             clusters[entity_class][entity_type] = {entity_type}
         if len(entities) > cmd_args.maximal_number_of_enttity_types:
             for entity_type, freq in entities[n:]:
@@ -104,9 +103,18 @@ def main():
                     [it[0] for it in entities[0:n]]
                 )
                 similar_entity_type = entities[index_of_similar_item][0]
-                rules[entity_class][entity_type] = similar_entity_type
                 clusters[entity_class][similar_entity_type].add(entity_type)
         del entities
+        entity_types = sorted(list(clusters[entity_class].keys()))
+        new_clusters_of_entity_class = dict()
+        for entity_type in entity_types:
+            values = sorted(list(clusters[entity_class][entity_type]),
+                            key=lambda it: (len(it), it))
+            new_clusters_of_entity_class[values[0]] = set(values)
+            for val in values:
+                rules[entity_class][val] = values[0]
+        clusters[entity_class] = new_clusters_of_entity_class
+        del new_clusters_of_entity_class, entity_types
     del entity_freq
     assert set(clusters.keys()) == set(rules.keys())
     for entity_class in sorted(list(clusters.keys())):
